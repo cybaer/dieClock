@@ -62,7 +62,6 @@ ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
   }
 }
 
-AnalogStabilizer Stab;
 
 int main(void)
 {
