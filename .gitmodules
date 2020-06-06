@@ -1,0 +1,6 @@
+[submodule "lib"]
+	path = lib
+	url = git@github.com:cybaer/lib
+[submodule "/home/cybaer/git/dieClock/avrlib"]
+	path = /home/cybaer/git/dieClock/avrlib
+	url = git@github.com:cybaer/avril
