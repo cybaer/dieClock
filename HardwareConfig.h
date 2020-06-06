@@ -25,6 +25,7 @@
 #include "avrlib/devices/switch.h"
 #include "avrlib/adc.h"
 #include "lib/ui/EdgeTrigger.h"
+#include "lib/ui/analogSwitch.h"
 
 // __Compiler Bug__
 __extension__ typedef int __guard __attribute__((mode (__DI__)));
@@ -67,7 +68,7 @@ typedef DebouncedSwitch< Gpio<PortD, 0> > Button;  // 0
 typedef Gpio<PortD, 1> LED;  // 1
 
 typedef EdgeTrigger<Gpio<PortD, 2>, 0> ClockIn;  // xx
-typedef EdgeTrigger<Gpio<PortC, 1>, 0> ResetIn;  // xx
+typedef EdgeTrigger<Gpio<PortC, 1>, 1> ResetIn;  // xx
 
 
 typedef Inverter<Gpio<PortB, 1> > Output_10;  //
@@ -81,10 +82,19 @@ typedef Inverter<Gpio<PortB, 2> > Output_3;  //
 typedef Inverter<Gpio<PortB, 4> > Output_2;  //
 typedef Inverter<Gpio<PortB, 3> > Output_1;  //
 
-
+extern Adc adc;
+static const uint8_t AdcChannelCV = 0;
+static const uint8_t AdcChannel204 = 2;
+static const uint8_t AdcChannelTempo = 3;
+static const uint8_t AdcChannelMode = 4;
 static const uint8_t AdcChannelPoti = 5;
 
-extern Adc adc;
+typedef AnalogSwitch<Adc, AdcChannel204, 3> Switch204;
+typedef AnalogSwitch<Adc, AdcChannelTempo, 3> SwitchTempo;
+typedef AnalogSwitch<Adc, AdcChannelPoti, 3> SwitchMode;
+
+//A0 ist CVin
+
 
 template<typename Port, int8_t Divider>
 class DividerOutput
@@ -174,6 +184,9 @@ inline void initOutputs(void)
 inline void initAnalogIn(void)
 {
   adc.Init();
+  Switch204::init();
+  SwitchTempo::init();
+  SwitchMode::init();
 }
 
 inline void initHW(void)

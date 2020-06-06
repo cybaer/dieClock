@@ -24,7 +24,6 @@
 #include "HardwareConfig.h"
 #include "clock.h"
 #include "ui.h"
-#include "med5.h"
 
 // __Compiler Bug__
 int __cxa_guard_acquire(__guard *g) {return !*(char *)(g);};
@@ -89,16 +88,10 @@ int main(void)
 
   Adc::StartConversion(AdcChannelPoti);
 
- // ui.init();
+  ui.init();
   // after initialization of all port extender IOs
   initHW();
   _delay_ms(50);
-
-  static uint8_t min = 255;
-  static uint8_t max = 0;
-
-  Median med;
-
 
   while(1)
   {
@@ -107,53 +100,8 @@ int main(void)
     {
       poll = false;
       ui.poll();
-      //ui.doEvents();
+      ui.doEvents();
     }
-
-    if(Button::low())
-    {
-      min = 255;
-      max = 0;
-    }
-    if (Adc::ready())
-    {
-
-      //uint16_t val = Stab(Adc::Read(AdcChannelPoti)/2)/2;
-      uint16_t val = med.getMedian(Adc::Read(AdcChannelPoti)/4);
-      uint16_t bpm = 30l + val;
-      clock.update(bpm);
-
-      Adc::StartConversion(AdcChannelPoti);
-/* debug...
- *
-      bool test = val > 127;
-
-      if(val < min) min = val;
-      if(val > max) max = val;
-
-      Output_7::set_value(max & 0x1);
-      Output_6::set_value(max & 0x2);
-      Output_5::set_value(max & 0x4);
-
-      Output_10::set_value(min & 0x1);
-      Output_9::set_value(min & 0x2);
-      Output_8::set_value(min & 0x4);
-
-      LED::set_value(test);
-      //LED::Toggle();
-
-       */
-    }
-
-
-  /*  if(ResetIn::isTriggered())
-    {
-
-    }
-*/
-    if(ClockIn::isTriggered())
-    {
-      bool TaktStart = clock.ClockInEdge();
-    }
+    ui.doEvents();
   }
 }

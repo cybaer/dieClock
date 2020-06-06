@@ -10,24 +10,21 @@
 
 #include "HardwareConfig.h"
 
-
-
 using namespace avrlib;
 class Ui
 {
 public:
   //Ui(void);
-  //void init();
+  void init();
   void poll();
-  //void doEvents();
+  void doEvents();
   void onClock();
 
-
 private:
-  int8_t m_Button;
-  int8_t m_Counter;
-
-
+  int8_t m_AdcChannel;
+  int8_t m_Tempo;
+  int8_t m_Mode;
+  int8_t m_204;
 };
 
 class DividerFarm;
@@ -67,13 +64,8 @@ class DividerFarm
 {
   static const int8_t DividerCount = 12;
   static const int8_t MaxDivider = 16;
-public:
-  /*DividerFarm(int8_t d1=1, int8_t d2=2, int8_t d3=3, int8_t d4=4,
-              int8_t d5=5, int8_t d6=7, int8_t d7=8, int8_t d8=12,
-              int8_t d9=16, int8_t d10=24, int8_t d11=64, int8_t d12=128)
-  : m_Divider{d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12}
-  {}*/
 
+public:
   static void registerDivider(Divider* div)
   {
     if(m_Counter < MaxDivider)
@@ -82,7 +74,6 @@ public:
       m_Counter++;
     }
   }
-
   static void reset(void)
   {
       for(int8_t i=0; i<m_Counter; i++)
@@ -101,7 +92,6 @@ private:
   static Divider* m_Divider[MaxDivider];
   static int8_t m_Counter;
 };
-
 
 extern Ui ui;
 
