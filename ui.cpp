@@ -59,9 +59,13 @@ void Ui::doEvents()
       {
         if(m_Mode == 2)
         {
-          uint16_t val = Adc::Read(AdcChannelCV) / 4 + 8;
+          uint32_t val = Adc::Read(AdcChannelCV) / 4;
+          // CV calibration -5.0V:255, 0.0V:127, +5.0V:0
+          val *= 1083l;
+          val /= 1024l;
+          val -= 1;
+          // mapping to +-30 BPM
           m_BpmOffset = U8U8MulShift8(val, 60) - 30;
-
         }
         else
         {
@@ -73,18 +77,12 @@ void Ui::doEvents()
       case AdcChannelPoti:
       {
         uint16_t val = med.getMedian(Adc::Read(AdcChannelPoti) / 4);
-        uint16_t bpm = m_Tempo == 0 ? U8U8MulShift8(val, 60) + 30 :
-                       m_Tempo == 1 ? U8U8MulShift8(val, 120) + 60 :
-                       m_Tempo == 2 ? U8U8MulShift8(val, 240) + 120 :
-                       120;
+        uint16_t bpm = m_Tempo == 0 ? U8U8MulShift8(val, 60) + 30 :     // maps to  30 ...  90
+                       m_Tempo == 1 ? U8U8MulShift8(val, 120) + 60 :    // maps to 360 ... 180
+                       m_Tempo == 2 ? U8U8MulShift8(val, 240) + 120 :   // maps to 120 ... 360
+                       120;                                             // default 120 BPM
         clock.update(bpm - m_BpmOffset);
-        uint8_t x = m_BpmOffset;
-        Output_5::set_value(x&0x01);
-        Output_6::set_value(x&0x02);
-        Output_7::set_value(x&0x04);
-        Output_8::set_value(x&0x08);
-        Output_9::set_value(x&0x10);
-        Output_10::set_value(x&0x20);
+
         m_AdcChannel = AdcChannel204;
         break;
       }
@@ -146,13 +144,12 @@ void Ui::onClock()
       break;
     }
   }
-  /*Output_5::set_value(Div_2.getValue());
+  Output_5::set_value(Div_2.getValue());
   Output_6::set_value(Div_4.getValue());
   Output_7::set_value(Div_8.getValue());
   Output_8::set_value(Div_12.getValue());
   Output_9::set_value(Div_24.getValue());
   Output_10::set_value(Div_128.getValue());
-  */
 }
 
 Divider::Divider(uint8_t divider)
