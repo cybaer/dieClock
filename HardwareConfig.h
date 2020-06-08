@@ -38,28 +38,24 @@ extern "C" void __cxa_pure_virtual();
 
 using namespace avrlib;
 
-
-
-
-
-typedef DebouncedSwitch< Gpio<PortD, 0> > Button;  // 0
+typedef DebouncedSwitch< Gpio<PortD, 0> > Button;
 
 typedef Gpio<PortD, 1> LED;  // 1
 
-typedef EdgeTrigger<Gpio<PortD, 3>, 0> ClockIn;  // xx
-typedef EdgeTrigger<Gpio<PortC, 1>, 1> ResetIn;  // xx
+typedef EdgeTrigger<Gpio<PortD, 3>, 0> ClockIn;
+typedef EdgeTrigger<Gpio<PortC, 1>, 1> ResetIn;
 
 
-typedef Inverter<Gpio<PortB, 1> > Output_10;  //
-typedef Inverter<Gpio<PortD, 5> > Output_9;  //
-typedef Inverter<Gpio<PortD, 7> > Output_8;  //
-typedef Inverter<Gpio<PortD, 6> > Output_7;  //
-typedef Inverter<Gpio<PortB, 0> > Output_6;  //
-typedef Inverter<Gpio<PortD, 4> > Output_5;  //
-typedef Inverter<Gpio<PortB, 5> > Output_4;  //
-typedef Inverter<Gpio<PortB, 2> > Output_3;  //
-typedef Inverter<Gpio<PortB, 4> > Output_2;  //
-typedef Inverter<Gpio<PortB, 3> > Output_1;  //
+typedef Inverter<Gpio<PortB, 1> > Output_10;
+typedef Inverter<Gpio<PortD, 5> > Output_9;
+typedef Inverter<Gpio<PortD, 7> > Output_8;
+typedef Inverter<Gpio<PortD, 6> > Output_7;
+typedef Inverter<Gpio<PortB, 0> > Output_6;
+typedef Inverter<Gpio<PortD, 4> > Output_5;
+typedef Inverter<Gpio<PortB, 5> > Output_4;
+typedef Inverter<Gpio<PortB, 2> > Output_3;
+typedef Inverter<Gpio<PortB, 4> > Output_2;
+typedef Inverter<Gpio<PortB, 3> > Output_1;
 
 extern Adc adc;
 static const uint8_t AdcChannelCV = 0;
@@ -72,15 +68,11 @@ typedef AnalogSwitch<Adc, AdcChannel204, 3> Switch204;
 typedef AnalogSwitch<Adc, AdcChannelTempo, 3> SwitchTempo;
 typedef AnalogSwitch<Adc, AdcChannelMode, 3> SwitchMode;
 
-//A0 ist CVin
-
-
 template<typename Port, int8_t Divider>
 class DividerOutput
 {
 public:
-
-  static void Do(bool in)
+  inline static void Do(bool in)
   {
     if(in != m_OldValue)
     {
@@ -92,7 +84,7 @@ public:
       }
     }
   }
-  static void setActive(bool active)
+  inline static void setActive(bool active)
   {
     m_Active = active;
     if(m_Active)
@@ -115,16 +107,13 @@ template<typename DO_1, typename DO_2, typename DO_3>
 class TripleDividerOutput
 {
 public:
-  static void Do(bool in)
+  inline static void Do(bool in)
   {
     DO_1::Do(in);
     DO_2::Do(in);
     DO_3::Do(in);
   }
 };
-
-
-//typedef DividerOutput<Output_1, 2> Div_2;
 
 inline void initInputs(void)
 {
@@ -157,7 +146,6 @@ inline void initOutputs(void)
 
   LED::set_mode(DIGITAL_OUTPUT);
   LED::set_value(false);
-
 }
 
 inline void initAnalogIn(void)

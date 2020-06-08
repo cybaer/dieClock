@@ -17,9 +17,7 @@ public:
   : pos(0)
   , a{init,init,init,init,init}
   , m{0,0,0,0,0}
-  {
-
-  }
+  {}
 
   inline uint8_t getMedian(uint8_t val)
   {
@@ -80,8 +78,6 @@ private:
   int8_t pos;
   uint8_t a[5];
   uint8_t m[5];
-
-
 };
 
 

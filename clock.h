@@ -70,8 +70,7 @@ public:
   }
 
   static bool getClock(void) { return (m_DeltaTick & 0x8) == 0; }
-
-  void update(uint16_t bpm, uint8_t multiplier = 1, uint8_t divider = 1/* ,uint8_t groove_template, uint8_t groove_amount*/);
+  void update(uint16_t bpm, uint8_t multiplier = 1, uint8_t divider = 1);
 
 private:
   static bool m_Running;
