@@ -1,8 +1,19 @@
 /*
- * clock.h
+ * ui.cpp
  *
- *  Created on: 26.04.2016
+ *  Created on: 17.05.2020
  *      Author: cybaer
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef CLOCK_H_
@@ -45,7 +56,7 @@ public:
     // safe actual m_TickCount (Attention! 16bit copy not thread safe)
     do newTick = m_TickCount;
     while(newTick != m_TickCount);
-    // 256 Ticks from Clock to Clock
+    // INTERVALL_TICKS from Clock to Clock
     uint16_t deltaTick = newTick - m_OldTick;
     uint32_t numerator = static_cast<uint32_t>(m_Interval) * deltaTick;
     volatile uint16_t interval = numerator / INTERVALL_TICKS;
@@ -55,8 +66,6 @@ public:
     sei();
 
     m_OldTick = newTick;
-
-    LED::Toggle();
     return false;
   }
 
@@ -66,11 +75,9 @@ public:
 
 private:
   static bool m_Running;
-  //static uint32_t m_Clock;
   static volatile uint16_t m_TickCount;
   static uint16_t m_OldTick;
   static int8_t m_DeltaTick;
-  //static uint16_t m_Intervals[NumStepsInGroovePattern]; für Groove Pattern, Humanizing, ...
   static uint16_t m_Interval;
 };
 

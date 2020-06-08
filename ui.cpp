@@ -3,6 +3,17 @@
  *
  *  Created on: 17.05.2020
  *      Author: cybaer
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "avrlib/op.h"
@@ -24,10 +35,12 @@ Divider Div_64(64);
 Divider Div_128(128);
 
 Median med;
-
+static const int8_t MODE_EXTERNAL = 0;
+static const int8_t MODE_INTERNAL = 2;
 
 void Ui::init()
 {
+  m_Stop = true;
   m_BpmOffset = 0;
   m_204 = Switch204::getValue();
   m_Tempo = SwitchTempo::getValue();
@@ -48,7 +61,11 @@ void Ui::doEvents()
   }
   if(ClockIn::isTriggered())
   {
-    bool TaktStart = clock.ClockInEdge();
+    if(m_Mode == MODE_EXTERNAL)
+    {
+      m_Stop = false;
+      (void)clock.ClockInEdge();
+    }
   }
 
   if (Adc::ready())
@@ -57,7 +74,7 @@ void Ui::doEvents()
     {
       case AdcChannelCV:
       {
-        if(m_Mode == 2)
+        if(m_Mode == MODE_INTERNAL)
         {
           uint32_t val = Adc::Read(AdcChannelCV) / 4;
           // CV calibration -5.0V:255, 0.0V:127, +5.0V:0
@@ -76,13 +93,15 @@ void Ui::doEvents()
       }
       case AdcChannelPoti:
       {
-        uint16_t val = med.getMedian(Adc::Read(AdcChannelPoti) / 4);
-        uint16_t bpm = m_Tempo == 0 ? U8U8MulShift8(val, 60) + 30 :     // maps to  30 ...  90
-                       m_Tempo == 1 ? U8U8MulShift8(val, 120) + 60 :    // maps to 360 ... 180
-                       m_Tempo == 2 ? U8U8MulShift8(val, 240) + 120 :   // maps to 120 ... 360
-                       120;                                             // default 120 BPM
-        clock.update(bpm - m_BpmOffset);
-
+        if(m_Mode == MODE_INTERNAL)
+        {
+          uint16_t val = med.getMedian(Adc::Read(AdcChannelPoti) / 4);
+          uint16_t bpm = m_Tempo == 0 ? U8U8MulShift8(val, 60) + 30 :     // maps to  30 ...  90
+                         m_Tempo == 1 ? U8U8MulShift8(val, 120) + 60 :    // maps to 360 ... 180
+                         m_Tempo == 2 ? U8U8MulShift8(val, 240) + 120 :   // maps to 120 ... 360
+                         120;                                             // default 120 BPM
+          clock.update(bpm - m_BpmOffset);
+        }
         m_AdcChannel = AdcChannel204;
         break;
       }
@@ -100,7 +119,14 @@ void Ui::doEvents()
       }
       case AdcChannelMode:
       {
-        m_Mode = SwitchMode::getValue();
+        int8_t mode = SwitchMode::getValue();
+        if(mode == MODE_EXTERNAL && m_Mode != MODE_EXTERNAL)
+        {
+          m_Stop = true;
+          DividerFarm::reset();
+        }
+        if(mode == MODE_INTERNAL) m_Stop = false;
+        m_Mode = mode;
         m_AdcChannel = AdcChannelCV;
         break;
       }
@@ -111,7 +137,7 @@ void Ui::doEvents()
 
 void Ui::onClock()
 {
-  volatile bool clk = clock.getClock();
+  bool clk = m_Stop ? false : clock.getClock();
   LED::set_value(clk);
   bool out1 = false;
   if(Button::high() && ResetIn::getValue() == 0)
@@ -153,13 +179,13 @@ void Ui::onClock()
 }
 
 Divider::Divider(uint8_t divider)
-  : m_Divider(divider)
-  , m_Counter(0)
-  , m_OldValue(false)
-  , m_Output(false)
-  {
-    DividerFarm::registerDivider(this);
-  }
+: m_Divider(divider)
+, m_Counter(0)
+, m_OldValue(false)
+, m_Output(false)
+{
+  DividerFarm::registerDivider(this);
+}
 
 Divider* DividerFarm::m_Divider[MaxDivider];
 int8_t DividerFarm::m_Counter=0;

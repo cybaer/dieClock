@@ -46,7 +46,7 @@ typedef DebouncedSwitch< Gpio<PortD, 0> > Button;  // 0
 
 typedef Gpio<PortD, 1> LED;  // 1
 
-typedef EdgeTrigger<Gpio<PortD, 2>, 0> ClockIn;  // xx
+typedef EdgeTrigger<Gpio<PortD, 3>, 0> ClockIn;  // xx
 typedef EdgeTrigger<Gpio<PortC, 1>, 1> ResetIn;  // xx
 
 

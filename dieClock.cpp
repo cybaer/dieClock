@@ -51,7 +51,7 @@ ISR(TIMER2_OVF_vect, ISR_NOBLOCK)
   while (num_clock_ticks)
   {
     --num_clock_ticks;
-    ui.onClock(); // reicht Clock an die App weiter
+    ui.onClock();
   }
   static int8_t subClock = 0;
   subClock = (subClock + 1) & 3;
@@ -68,17 +68,15 @@ int main(void)
   // Configure the timers.
     static const uint8_t PRESCALER = 3;
     static const uint8_t PRESCALER_VALUE = 64;
-    //PWM mit CTC
+    //PWM with CTC
     Timer<1>::set_mode(0, _BV(WGM12), PRESCALER);
     int16_t startFreq = 1024;
     int16_t counterForStartFreq = (20000000L / PRESCALER_VALUE) / startFreq -1;
-
     PwmChannel1A::set_frequency(counterForStartFreq);
     Timer<1>::StartCompare();
     //TIMSK |= (1<<OCIE1A);
 
-    //     16MHz / (8 * 510) = 3906,25 Hz
-    // prescaler(2)_|
+
     Timer<2>::set_prescaler(2);
     Timer<2>::set_mode(TIMER_PWM_PHASE_CORRECT);
     Timer<2>::Start();
