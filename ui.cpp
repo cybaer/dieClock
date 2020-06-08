@@ -28,10 +28,11 @@ Median med;
 
 void Ui::init()
 {
+  m_BpmOffset = 0;
   m_204 = Switch204::getValue();
   m_Tempo = SwitchTempo::getValue();
   m_Mode = SwitchMode::getValue();
-  m_AdcChannel = AdcChannelPoti;
+  m_AdcChannel = AdcChannelCV;
   Adc::StartConversion(m_AdcChannel);
 }
 void Ui::poll()
@@ -54,15 +55,36 @@ void Ui::doEvents()
   {
     switch(m_AdcChannel)
     {
+      case AdcChannelCV:
+      {
+        if(m_Mode == 2)
+        {
+          uint16_t val = Adc::Read(AdcChannelCV) / 4 + 8;
+          m_BpmOffset = U8U8MulShift8(val, 60) - 30;
+
+        }
+        else
+        {
+          m_BpmOffset = 0;
+        }
+        m_AdcChannel = AdcChannelPoti;
+        break;
+      }
       case AdcChannelPoti:
       {
-        uint16_t val = med.getMedian(Adc::Read(AdcChannelPoti)/4);
-
+        uint16_t val = med.getMedian(Adc::Read(AdcChannelPoti) / 4);
         uint16_t bpm = m_Tempo == 0 ? U8U8MulShift8(val, 60) + 30 :
                        m_Tempo == 1 ? U8U8MulShift8(val, 120) + 60 :
                        m_Tempo == 2 ? U8U8MulShift8(val, 240) + 120 :
                        120;
-        clock.update(bpm);
+        clock.update(bpm - m_BpmOffset);
+        uint8_t x = m_BpmOffset;
+        Output_5::set_value(x&0x01);
+        Output_6::set_value(x&0x02);
+        Output_7::set_value(x&0x04);
+        Output_8::set_value(x&0x08);
+        Output_9::set_value(x&0x10);
+        Output_10::set_value(x&0x20);
         m_AdcChannel = AdcChannel204;
         break;
       }
@@ -81,7 +103,7 @@ void Ui::doEvents()
       case AdcChannelMode:
       {
         m_Mode = SwitchMode::getValue();
-        m_AdcChannel = AdcChannelPoti;
+        m_AdcChannel = AdcChannelCV;
         break;
       }
     }
@@ -124,12 +146,13 @@ void Ui::onClock()
       break;
     }
   }
-  Output_5::set_value(Div_2.getValue());
+  /*Output_5::set_value(Div_2.getValue());
   Output_6::set_value(Div_4.getValue());
   Output_7::set_value(Div_8.getValue());
   Output_8::set_value(Div_12.getValue());
   Output_9::set_value(Div_24.getValue());
   Output_10::set_value(Div_128.getValue());
+  */
 }
 
 Divider::Divider(uint8_t divider)

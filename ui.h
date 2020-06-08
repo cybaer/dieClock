@@ -25,6 +25,7 @@ private:
   int8_t m_Tempo;
   int8_t m_Mode;
   int8_t m_204;
+  int8_t m_BpmOffset;
 };
 
 class DividerFarm;

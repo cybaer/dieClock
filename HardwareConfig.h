@@ -70,7 +70,7 @@ static const uint8_t AdcChannelPoti = 5;
 
 typedef AnalogSwitch<Adc, AdcChannel204, 3> Switch204;
 typedef AnalogSwitch<Adc, AdcChannelTempo, 3> SwitchTempo;
-typedef AnalogSwitch<Adc, AdcChannelPoti, 3> SwitchMode;
+typedef AnalogSwitch<Adc, AdcChannelMode, 3> SwitchMode;
 
 //A0 ist CVin
 
