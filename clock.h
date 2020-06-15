@@ -25,7 +25,7 @@
 
 using namespace avrlib;
 static const uint8_t INTERVALL_TICKS = 16;
-static const int8_t STEPS = 8;
+//static const int8_t STEPS = 8;
 class Clock
 {
 public:
@@ -50,7 +50,7 @@ public:
     m_DeltaTick = m_TickCount - m_OldTick;
     return m_Interval;
   }
-  static bool ClockInEdge(void)
+  static inline bool ClockInEdge(void)
   {
     uint16_t newTick;
     // safe actual m_TickCount (Attention! 16bit copy not thread safe)
@@ -69,7 +69,11 @@ public:
     return false;
   }
 
-  static bool getClock(void) { return (m_DeltaTick & 0x8) == 0; }
+  static inline bool getClock(void)
+  {
+    static uint8_t resBit = INTERVALL_TICKS / m_Resolution;
+    return (m_DeltaTick & resBit) == 0;
+  }
   void update(uint16_t bpm, uint8_t multiplier = 1, uint8_t divider = 1);
 
 private:
@@ -78,6 +82,7 @@ private:
   static uint16_t m_OldTick;
   static int8_t m_DeltaTick;
   static uint16_t m_Interval;
+  static uint8_t m_Resolution;
 };
 
 extern Clock clock;

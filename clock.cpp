@@ -24,6 +24,7 @@ bool Clock::m_Running = true;
 volatile uint16_t Clock::m_TickCount = 0;
 uint16_t Clock::m_OldTick = 0;
 int8_t Clock::m_DeltaTick = 0;
+uint8_t Clock::m_Resolution = 4;
 
 uint16_t Clock::m_Interval = 39062; //1221 --> 60BPM mit 256 Sub-Ticks
 
